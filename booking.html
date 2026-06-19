@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись - Добрыня Никитич</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 70px; }
+        .header { background: #1B5E20; color: white; padding: 20px; text-align: center; }
+        .header h1 { font-size: 24px; }
+        .header p { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+        .page-title { padding: 20px; text-align: center; font-size: 22px; color: #1B5E20; }
+        .form-container { padding: 0 20px 20px 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .form-group input:focus, .form-group select:focus { border-color: #1B5E20; outline: none; }
+        .btn-submit { width: 100%; padding: 15px; background: #1B5E20; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background: #2E7D32; }
+        .booking-list { margin-top: 30px; padding: 0 20px 20px 20px; }
+        .booking-list h3 { color: #1B5E20; margin-bottom: 10px; }
+        .booking-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #FFD700; display: flex; justify-content: space-between; align-items: center; }
+        .booking-info { flex: 1; }
+        .booking-item strong { color: #1B5E20; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-delete:hover { background: #c0392b; }
+        .bottom-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; max-width: 480px; margin: 0 auto; }
+        .bottom-menu a { text-align: center; text-decoration: none; color: #666; font-size: 12px; }
+        .bottom-menu a.active { color: #1B5E20; font-weight: bold; }
+        .bottom-menu a i { display: block; font-size: 20px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Добрыня Никитич</h1>
+            <p>Забота о вашем питомце с любовью</p>
+        </div>
+        <div class="page-title">Запись на услугу</div>
+        <div class="form-container">
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label>Услуга</label>
+                    <select id="service" required>
+                        <option value="Стрижка">Стрижка - 2000 ₽</option>
+                        <option value="Купание">Купание - 1500 ₽</option>
+                        <option value="Комплекс">Комплекс - 3000 ₽</option>
+                        <option value="Вычесывание колтунов">Вычесывание колтунов - 1000 ₽</option>
+                        <option value="Стрижка когтей">Стрижка когтей - 500 ₽</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Дата</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Время</label>
+                    <input type="time" id="time" required>
+                </div>
+                <div class="form-group">
+                    <label>Имя питомца</label>
+                    <input type="text" id="petName" placeholder="Например: Барсик" required>
+                </div>
+                <div class="form-group">
+                    <label>Порода</label>
+                    <input type="text" id="breed" placeholder="Например: Лабрадор">
+                </div>
+                <div class="form-group">
+                    <label>Ваше имя</label>
+                    <input type="text" id="ownerName" placeholder="Как к вам обращаться" required>
+                </div>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="tel" id="phone" placeholder="+7 (999) 123-45-67" required>
+                </div>
+                <button type="submit" class="btn-submit"><i class="fas fa-calendar-check"></i> Записаться</button>
+            </form>
+        </div>
+        <div class="booking-list" id="bookingList">
+            <h3>Мои записи</h3>
+            <div id="bookingsContainer"></div>
+        </div>
+        <div class="bottom-menu">
+            <a href="index.html"><i class="fas fa-home"></i>Домой</a>
+            <a href="services.html"><i class="fas fa-scissors"></i>Услуги</a>
+            <a href="booking.html" class="active"><i class="fas fa-calendar-check"></i>Запись</a>
+            <a href="chat.html"><i class="fas fa-comment"></i>Чат</a>
+        </div>
+    </div>
+    <script>
+        function loadBookings() {
+            const container = document.getElementById('bookingsContainer');
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            if (bookings.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">У вас пока нет записей</p>';
+                return;
+            }
+            container.innerHTML = bookings.map((b, index) => `
+                <div class="booking-item">
+                    <div class="booking-info">
+                        <strong>${b.service}</strong><br>
+                        ${b.date} в ${b.time}<br>
+                        Питомец: ${b.petName} (${b.breed || 'не указана'})<br>
+                        Хозяин: ${b.ownerName}, ${b.phone}
+                    </div>
+                    <button class="btn-delete" data-index="${index}">
+                        <i class="fas fa-times"></i> Отменить
+                    </button>
+                </div>
+            `).join('');
+
+            // Добавляем обработчики на кнопки удаления
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    deleteBooking(index);
+                });
+            });
+        }
+
+        function deleteBooking(index) {
+            if (confirm('Вы уверены, что хотите отменить эту запись?')) {
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                bookings.splice(index, 1);
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+                loadBookings();
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const booking = {
+                service: document.getElementById('service').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                petName: document.getElementById('petName').value,
+                breed: document.getElementById('breed').value || 'не указана',
+                ownerName: document.getElementById('ownerName').value,
+                phone: document.getElementById('phone').value
+            };
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            bookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            this.reset();
+            loadBookings();
+            alert('✅ Запись добавлена!');
+        });
+
+        loadBookings();
+    </script>
+</body>
+</html>

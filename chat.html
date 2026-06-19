@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат - Добрыня Никитич</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 480px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 70px; display: flex; flex-direction: column; }
+        .header { background: #1B5E20; color: white; padding: 20px; text-align: center; flex-shrink: 0; }
+        .header h1 { font-size: 24px; }
+        .header p { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+        .chat-messages { flex: 1; padding: 15px 20px; overflow-y: auto; max-height: 60vh; background: #f9f9f9; }
+        .message { margin-bottom: 12px; padding: 10px 14px; border-radius: 12px; max-width: 85%; word-wrap: break-word; }
+        .user-message { background: #1B5E20; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .bot-message { background: white; color: #333; border: 1px solid #ddd; margin-right: auto; border-bottom-left-radius: 4px; }
+        .bot-message strong { color: #1B5E20; }
+        .chat-input { display: flex; padding: 10px 20px; border-top: 1px solid #ddd; background: white; flex-shrink: 0; }
+        .chat-input input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; margin-right: 10px; }
+        .chat-input button { padding: 12px 20px; background: #1B5E20; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        .chat-input button:hover { background: #2E7D32; }
+        .bottom-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; max-width: 480px; margin: 0 auto; }
+        .bottom-menu a { text-align: center; text-decoration: none; color: #666; font-size: 12px; }
+        .bottom-menu a.active { color: #1B5E20; font-weight: bold; }
+        .bottom-menu a i { display: block; font-size: 20px; margin-bottom: 2px; }
+        .quick-replies { display: flex; gap: 8px; padding: 10px 20px; flex-wrap: wrap; background: #f9f9f9; }
+        .quick-reply { background: #e8f5e9; color: #1B5E20; border: none; padding: 6px 14px; border-radius: 16px; font-size: 14px; cursor: pointer; }
+        .quick-reply:hover { background: #c8e6c9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Добрыня Никитич</h1>
+            <p>Чат-ассистент</p>
+        </div>
+        <div class="quick-replies">
+            <button class="quick-reply" data-text="услуги">📋 Услуги</button>
+            <button class="quick-reply" data-text="цены">💰 Цены</button>
+            <button class="quick-reply" data-text="мои записи">📅 Мои записи</button>
+            <button class="quick-reply" data-text="контакты">📞 Контакты</button>
+            <button class="quick-reply" data-text="о нас">ℹ️ О нас</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <strong>🐕 Добрый день!</strong><br>
+                Я виртуальный ассистент студии "Добрыня Никитич".<br>
+                Напишите мне, что вас интересует:<br>
+                <strong>услуги</strong>, <strong>цены</strong>, <strong>запись</strong>, <strong>мои записи</strong>, <strong>контакты</strong> или <strong>о нас</strong>.
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Напишите ваш вопрос..." autofocus>
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <div class="bottom-menu">
+            <a href="index.html"><i class="fas fa-home"></i>Домой</a>
+            <a href="services.html"><i class="fas fa-scissors"></i>Услуги</a>
+            <a href="booking.html"><i class="fas fa-calendar-check"></i>Запись</a>
+            <a href="chat.html" class="active"><i class="fas fa-comment"></i>Чат</a>
+        </div>
+    </div>
+    <script>
+        // Данные из config.js (дублируем здесь для работы чата)
+        const config = {
+            services: [
+                { name: "Стрижка", price: 2000, duration: "1.5 часа" },
+                { name: "Купание", price: 1500, duration: "1 час" },
+                { name: "Комплекс", price: 3000, duration: "2.5 часа" },
+                { name: "Вычесывание колтунов", price: 1000, duration: "1 час" },
+                { name: "Стрижка когтей", price: 500, duration: "30 минут" }
+            ],
+            phone: "+7 (999) 123-45-67",
+            address: "г. Москва, ул. Примерная, д. 1",
+            name: "Добрыня Никитич"
+        };
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, isUser = false) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            div.innerHTML = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getBookingsText() {
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            if (bookings.length === 0) return 'У вас пока нет записей.';
+            return bookings.map((b, i) =>
+                `${i+1}. ${b.service} — ${b.date} в ${b.time}, питомец: ${b.petName}`
+            ).join('<br>');
+        }
+
+        function getServicesText() {
+            return config.services.map(s =>
+                `• <strong>${s.name}</strong> — ${s.price} ₽ (${s.duration})`
+            ).join('<br>');
+        }
+
+        function getPricesText() {
+            return config.services.map(s =>
+                `• ${s.name} — ${s.price} ₽`
+            ).join('<br>');
+        }
+
+        function getBotReply(text) {
+            const lower = text.toLowerCase().trim();
+
+            if (lower.includes('услуг') || lower.includes('услуги')) {
+                return `📋 <strong>Наши услуги:</strong><br>${getServicesText()}`;
+            }
+            if (lower.includes('цен') || lower.includes('цены') || lower.includes('стоимость')) {
+                return `💰 <strong>Цены:</strong><br>${getPricesText()}`;
+            }
+            if (lower.includes('мои записи') || lower.includes('мои запис') || lower.includes('записи')) {
+                return `📅 <strong>Ваши записи:</strong><br>${getBookingsText()}`;
+            }
+            if (lower.includes('контакт') || lower.includes('телефон') || lower.includes('адрес')) {
+                return `📞 <strong>Контакты:</strong><br>Телефон: ${config.phone}<br>Адрес: ${config.address}`;
+            }
+            if (lower.includes('о нас') || lower.includes('о студии') || lower.includes('расскажи')) {
+                return `ℹ️ <strong>О студии "Добрыня Никитич":</strong><br>Мы — профессиональная груминг-студия с любовью к животным. Заботимся о ваших питомцах. Работаем по предварительной записи.`;
+            }
+            if (lower.includes('запись') || lower.includes('записаться')) {
+                return `📝 <strong>Запись:</strong><br>Чтобы записаться, перейдите на страницу "Запись" в нижнем меню или напишите: "запись [услуга] [дата] [время]" (например: "запись Стрижка 2026-06-25 14:00")`;
+            }
+            if (lower.startsWith('запись ')) {
+                // Попытка распарсить запись из сообщения
+                const parts = lower.replace('запись ', '').split(' ');
+                if (parts.length >= 3) {
+                    const serviceName = parts.slice(0, -2).join(' ');
+                    const date = parts[parts.length - 2];
+                    const time = parts[parts.length - 1];
+                    // Проверяем, есть ли такая услуга
+                    const found = config.services.find(s => s.name.toLowerCase() === serviceName.toLowerCase());
+                    if (found) {
+                        const booking = {
+                            service: found.name,
+                            date: date,
+                            time: time,
+                            petName: 'Через чат',
+                            breed: 'не указана',
+                            ownerName: 'Клиент',
+                            phone: 'не указан'
+                        };
+                        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                        bookings.push(booking);
+                        localStorage.setItem('bookings', JSON.stringify(bookings));
+                        return `✅ <strong>Запись добавлена!</strong><br>${found.name} на ${date} в ${time}. Спасибо!`;
+                    } else {
+                        return `❌ Не нашла услугу "${serviceName}".<br>Напишите "услуги", чтобы посмотреть список.`;
+                    }
+                }
+                return '❌ Напишите в формате: "запись [услуга] [дата] [время]"<br>Например: "запись Стрижка 2026-06-25 14:00"';
+            }
+
+            return `🤔 Я вас не поняла.<br>Напишите: <strong>услуги</strong>, <strong>цены</strong>, <strong>запись</strong>, <strong>мои записи</strong>, <strong>контакты</strong> или <strong>о нас</strong>.`;
+        }
+
+        function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, true);
+            chatInput.value = '';
+
+            // Имитация задержки ответа
+            setTimeout(() => {
+                const reply = getBotReply(text);
+                addMessage(reply, false);
+            }, 300);
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+
+        // Быстрые кнопки
+        document.querySelectorAll('.quick-reply').forEach(btn => {
+            btn.addEventListener('click', function() {
+                chatInput.value = this.dataset.text;
+                handleSend();
+            });
+        });
+    </script>
+</body>
+</html>
