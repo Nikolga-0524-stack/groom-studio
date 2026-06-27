@@ -63,14 +63,14 @@
         </div>
     </div>
     <script>
-        // Данные из config.js (дублируем здесь для работы чата)
+                // Данные из config.js (дублируем здесь для работы чата)
         const config = {
             services: [
-                { name: "Стрижка", price: 2000, duration: "1.5 часа" },
-                { name: "Купание", price: 1500, duration: "1 час" },
-                { name: "Комплекс", price: 3000, duration: "2.5 часа" },
-                { name: "Вычесывание колтунов", price: 1000, duration: "1 час" },
-                { name: "Стрижка когтей", price: 500, duration: "30 минут" }
+                { name: "Стрижка", duration: "1.5 часа" },
+                { name: "Купание", duration: "1 час" },
+                { name: "Комплекс", duration: "2.5 часа" },
+                { name: "Вычесывание колтунов", duration: "1 час" },
+                { name: "Стрижка когтей", duration: "30 минут" }
             ],
             phone: "+7 (963) 680-62-50",
             address: "г. Красногорск, Московская область, ул. Большая Воскресенская, д. 5",
@@ -97,17 +97,14 @@
             ).join('<br>');
         }
 
-        function getServicesText() {
-            return config.services.map(s =>
-                `• <strong>${s.name}</strong> — ${s.price} ₽ (${s.duration})`
-            ).join('<br>');
-        }
+       function getServicesText() {
+    return config.services.map(s =>
+        `• <strong>${s.name}</strong> (${s.duration})`
+    ).join('<br>');
+}
+        
 
-        function getPricesText() {
-            return config.services.map(s =>
-                `• ${s.name} — ${s.price} ₽`
-            ).join('<br>');
-        }
+       
 
         function getBotReply(text) {
             const lower = text.toLowerCase().trim();
@@ -116,8 +113,8 @@
                 return `📋 <strong>Наши услуги:</strong><br>${getServicesText()}`;
             }
             if (lower.includes('цен') || lower.includes('цены') || lower.includes('стоимость')) {
-                return `💰 <strong>Цены:</strong><br>${getPricesText()}`;
-            }
+    return `💰 <strong>Цены:</strong><br>Актуальные цены вы можете посмотреть в нашем <a href="price-list.pdf" target="_blank">прайс-листе</a> или скачать его на странице "Услуги и цены".`;
+}
             if (lower.includes('мои записи') || lower.includes('мои запис') || lower.includes('записи')) {
                 return `📅 <strong>Ваши записи:</strong><br>${getBookingsText()}`;
             }
@@ -183,12 +180,15 @@
         });
 
         // Быстрые кнопки
-        document.querySelectorAll('.quick-reply').forEach(btn => {
-            btn.addEventListener('click', function() {
-                chatInput.value = this.dataset.text;
-                handleSend();
-            });
-        });
+document.querySelectorAll('.quick-reply').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const text = this.dataset.text;
+        if (text) {
+            chatInput.value = text;
+            handleSend();
+        }
+    });
+});
     </script>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">

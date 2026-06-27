@@ -112,12 +112,13 @@
             .catch(() => {
                 // Если config.js не загрузился, показываем заглушку
                 const container = document.getElementById('servicesList');
-                container.innerHTML = `
-                    <div class="service-card"><h3>Стрижка</h3><div class="price">2000 ₽</div><div class="duration"><i class="fas fa-clock"></i> 1.5 часа</div></div>
-                    <div class="service-card"><h3>Купание</h3><div class="price">1500 ₽</div><div class="duration"><i class="fas fa-clock"></i> 1 час</div></div>
-                    <div class="service-card"><h3>Комплекс</h3><div class="price">3000 ₽</div><div class="duration"><i class="fas fa-clock"></i> 2.5 часа</div></div>
-                    <div class="service-card"><h3>Вычесывание колтунов</h3><div class="price">1000 ₽</div><div class="duration"><i class="fas fa-clock"></i> 1 час</div></div>
-                    <div class="service-card"><h3>Стрижка когтей</h3><div class="price">500 ₽</div><div class="duration"><i class="fas fa-clock"></i> 30 минут</div></div>
+               container.innerHTML = `
+    <div class="service-card"><h3>Стрижка</h3><div class="duration"><i class="fas fa-clock"></i> 1.5 часа</div></div>
+    <div class="service-card"><h3>Купание</h3><div class="duration"><i class="fas fa-clock"></i> 1 час</div></div>
+    <div class="service-card"><h3>Комплекс</h3><div class="duration"><i class="fas fa-clock"></i> 2.5 часа</div></div>
+    <div class="service-card"><h3>Вычесывание колтунов</h3><div class="duration"><i class="fas fa-clock"></i> 1 час</div></div>
+    <div class="service-card"><h3>Стрижка когтей</h3><div class="duration"><i class="fas fa-clock"></i> 30 минут</div></div>
+`;
                 `;
             });
     </script>

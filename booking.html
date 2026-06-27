@@ -45,11 +45,11 @@
                 <div class="form-group">
                     <label>Услуга</label>
                     <select id="service" required>
-                        <option value="Стрижка">Стрижка - 2000 ₽</option>
-                        <option value="Купание">Купание - 1500 ₽</option>
-                        <option value="Комплекс">Комплекс - 3000 ₽</option>
-                        <option value="Вычесывание колтунов">Вычесывание колтунов - 1000 ₽</option>
-                        <option value="Стрижка когтей">Стрижка когтей - 500 ₽</option>
+                        <option value="Стрижка">Стрижка</option>
+                        <option value="Купание">Купание</option>
+                        <option value="Комплекс">Комплекс</option>
+                        <option value="Вычесывание колтунов">Вычесывание колтунов</option>
+                        <option value="Стрижка когтей">Стрижка когтей</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -148,6 +148,45 @@
             loadBookings();
             alert('✅ Запись добавлена!');
         });
+// --- ОТПРАВКА УВЕДОМЛЕНИЯ В MAX ---
+// ЗАМЕНИТЕ НА СВОИ ДАННЫЕ!
+const MAX_TOKEN = "ВАШ_ТОКЕН_БОТА";  // скопируйте из MAX Business
+const MAX_USER_ID = "ВАШ_USER_ID";   // ваш ID в MAX
+
+// Формируем текст сообщения
+const messageText = `🆕 <b>Новая запись в груминг-студию "Добрыня Никитич"!</b>
+
+📋 Услуга: ${booking.service}
+📅 Дата: ${booking.date}
+⏰ Время: ${booking.time}
+🐕 Питомец: ${booking.petName}
+🐩 Порода: ${booking.breed || 'не указана'}
+👤 Хозяин: ${booking.ownerName}
+📞 Телефон: ${booking.phone}`;
+
+// Отправляем запрос в API MAX
+fetch('https://platform-api.max.ru/messages', {
+    method: 'POST',
+    headers: {
+        'Authorization': MAX_TOKEN,
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        user_id: MAX_USER_ID,  // или chat_id: MAX_CHAT_ID
+        text: messageText,
+        format: "html"
+    })
+})
+.then(response => {
+    if (response.ok) {
+        console.log('✅ Уведомление в MAX отправлено');
+    } else {
+        console.error('❌ Ошибка отправки в MAX:', response.status);
+    }
+})
+.catch(error => {
+    console.error('❌ Ошибка соединения с MAX:', error);
+});
 
         loadBookings();
     </script>
