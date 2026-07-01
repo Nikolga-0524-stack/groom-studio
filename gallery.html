@@ -36,7 +36,7 @@
         .gallery-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
         }
         .gallery-item .tag {
@@ -146,12 +146,23 @@
         // 📸 Список фотографий галереи
         // Добавляйте сюда свои фото: имя файла и подпись
         const galleryImages = [
-            { src: "work1.jpg", tag: "Пудель" },
-            { src: "work2.jpg", tag: "Лабрадор" },
-            { src: "work3.jpg", tag: "Йоркшир" },
-            { src: "work4.jpg", tag: "Спаниель" },
-            { src: "work5.jpg", tag: "Шпиц" },
-            { src: "work6.jpg", tag: "Мопс" }
+            { src: "images/йорк2.jpg", tag: "Йорк"  },
+            { src: "images/йорк.jpg", tag: "Йорк"  },
+            { src: "images/корги.jpg", tag: "Корги"  },
+            { src: "images/котик.jpg", tag: "Котик"  },
+            { src: "images/спаниель.jpg", tag: "Спаниель"  },
+            { src: "images/фото1.jpg", tag: " " },
+            { src: "images/фото4.jpg", tag: " " },
+            { src: "images/фото5.jpg", tag: "Йорк" },
+            { src: "images/фото6.jpg", tag: "Мелкий йорк" },
+            { src: "images/фото7.jpg", tag: " " },
+            { src: "images/фото8.jpg", tag: "Корги" },
+            { src: "images/фото9.jpg", tag: " " },
+            { src: "images/фото10.jpg", tag: "Йорк белый" },
+            { src: "images/фото11.jpg", tag: "Йорк" },
+            { src: "images/фото12.jpg", tag: "Йорк" },
+
+
         ];
 
         const grid = document.getElementById('galleryGrid');
